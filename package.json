@@ -1,0 +1,31 @@
+{
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
+    "app:build": "pnpm --filter @workspace/learn-platform run build",
+    "mobile:add:ios": "pnpm run app:build && cap add ios",
+    "mobile:sync": "pnpm run app:build && cap sync ios",
+    "mobile:open:ios": "cap open ios"
+  },
+  "private": true,
+  "dependencies": {
+    "@capacitor/core": "7.6.9",
+    "@replit/connectors-sdk": "^0.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.6.9",
+    "@capacitor/ios": "7.6.9",
+    "prettier": "^3.9.6",
+    "typescript": "~5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "tar": "7.5.22"
+    }
+  }
+}

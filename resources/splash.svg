@@ -1,0 +1,10 @@
+<svg width="2732" height="2732" viewBox="0 0 2732 2732" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="2732" height="2732" fill="#1F4D43"/>
+  <circle cx="2140" cy="620" r="380" fill="#F2A72E" fill-opacity=".16"/>
+  <circle cx="520" cy="2240" r="520" fill="#F8F5EF" fill-opacity=".06"/>
+  <rect x="866" y="714" width="1000" height="1000" rx="224" fill="#F2A72E"/>
+  <path d="M1138 1360V1014H1269C1388 1014 1454 1081 1454 1186C1454 1292 1388 1360 1269 1360H1138ZM1242 1267H1269C1321 1267 1349 1239 1349 1186C1349 1134 1321 1107 1269 1107H1242V1267Z" fill="#1F4D43"/>
+  <path d="M1478 1360V1014H1582C1701 1014 1767 1081 1767 1186C1767 1292 1701 1360 1582 1360H1478ZM1582 1267H1609C1661 1267 1689 1239 1689 1186C1689 1134 1661 1107 1609 1107H1582V1267Z" fill="#1F4D43" opacity=".92"/>
+  <text x="1366" y="1984" text-anchor="middle" fill="#F8F5EF" font-family="Arial, sans-serif" font-size="156" font-weight="700">لنتعلم</text>
+  <text x="1366" y="2152" text-anchor="middle" fill="#F8F5EF" fill-opacity=".72" font-family="Arial, sans-serif" font-size="66">تعلم واضح. تقدم ملموس.</text>
+</svg>

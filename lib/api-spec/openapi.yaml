@@ -1,0 +1,473 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+  - name: catalog
+  - name: subscriptions
+  - name: admin
+  - name: ai
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /auth/session:
+    get:
+      operationId: getSession
+      tags: [auth]
+      summary: Get the current session
+      responses:
+        "200":
+          description: Current session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Authenticated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "401":
+          description: Invalid credentials
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Created session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+  /catalog:
+    get:
+      operationId: getCatalog
+      tags: [catalog]
+      summary: Get the complete school hierarchy
+      responses:
+        "200":
+          description: Hierarchical catalog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Catalog"
+  /catalog/lessons/{lessonId}:
+    get:
+      operationId: getLesson
+      tags: [catalog]
+      parameters:
+        - $ref: "#/components/parameters/LessonId"
+      responses:
+        "200":
+          description: Lesson detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+        "402":
+          description: Subscription required
+  /subscriptions:
+    get:
+      operationId: getSubscription
+      tags: [subscriptions]
+      responses:
+        "200":
+          description: Current subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+    post:
+      operationId: submitSubscription
+      tags: [subscriptions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionInput"
+      responses:
+        "201":
+          description: Pending subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+  /admin/overview:
+    get:
+      operationId: getAdminOverview
+      tags: [admin]
+      responses:
+        "200":
+          description: Admin overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminOverview"
+  /admin/subscriptions:
+    get:
+      operationId: getAdminSubscriptions
+      tags: [admin]
+      responses:
+        "200":
+          description: Subscription requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubscriptionRequest"
+  /admin/subscriptions/{subscriptionId}/status:
+    patch:
+      operationId: updateSubscriptionStatus
+      tags: [admin]
+      parameters:
+        - $ref: "#/components/parameters/SubscriptionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionStatusInput"
+      responses:
+        "200":
+          description: Updated subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+  /admin/catalog:
+    post:
+      operationId: createCatalogItem
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CatalogItemInput"
+      responses:
+        "201":
+          description: Created catalog item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogItem"
+  /admin/settings:
+    get:
+      operationId: getSettings
+      tags: [admin]
+      responses:
+        "200":
+          description: Platform settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    patch:
+      operationId: updateSettings
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsInput"
+      responses:
+        "200":
+          description: Updated platform settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+  /ai/generate:
+    post:
+      operationId: generateAiContent
+      tags: [ai]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiGenerationInput"
+      responses:
+        "200":
+          description: Generated educational content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiGenerationResult"
+        "402":
+          description: Active subscription required
+components:
+  parameters:
+    LessonId:
+      name: lessonId
+      in: path
+      required: true
+      schema:
+        type: string
+    SubscriptionId:
+      name: subscriptionId
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    User:
+      type: object
+      required: [id, name, email, isAdmin, subscriptionStatus]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        isAdmin: { type: boolean }
+        subscriptionStatus:
+          type: string
+          enum: [none, pending, active, rejected, expired]
+    Session:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+    RegisterInput:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 2 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+    Catalog:
+      type: object
+      required: [stages]
+      properties:
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stage"
+    Stage:
+      type: object
+      required: [id, name, description, color, grades]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        color: { type: string }
+        grades:
+          type: array
+          items:
+            $ref: "#/components/schemas/Grade"
+    Grade:
+      type: object
+      required: [id, name, subjects]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        subjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subject"
+    Subject:
+      type: object
+      required: [id, name, icon, lessonCount, sections]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        icon: { type: string }
+        lessonCount: { type: integer }
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContentSection"
+    ContentSection:
+      type: object
+      required: [id, type, title, count]
+      properties:
+        id: { type: string }
+        type:
+          type: string
+          enum: [explanations, homework, exams, qiyas]
+        title: { type: string }
+        count: { type: integer }
+    Lesson:
+      type: object
+      required: [id, title, subjectName, content, locked]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        subjectName: { type: string }
+        content: { type: string }
+        locked: { type: boolean }
+    Subscription:
+      type: object
+      required: [status, plan, amount, submittedAt]
+      properties:
+        status:
+          type: string
+          enum: [none, pending, active, rejected, expired]
+        plan:
+          type: string
+          enum: [monthly, yearly]
+        amount: { type: number }
+        receiptName: { type: ["string", "null"] }
+        submittedAt: { type: ["string", "null"], format: date-time }
+    SubscriptionInput:
+      type: object
+      required: [plan, receiptName]
+      properties:
+        plan:
+          type: string
+          enum: [monthly, yearly]
+        receiptName: { type: string }
+    SubscriptionRequest:
+      allOf:
+        - $ref: "#/components/schemas/Subscription"
+        - type: object
+          required: [id, user]
+          properties:
+            id: { type: string }
+            user:
+              $ref: "#/components/schemas/User"
+    SubscriptionStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [active, rejected]
+    AdminOverview:
+      type: object
+      required: [students, activeSubscriptions, pendingRequests, lessons]
+      properties:
+        students: { type: integer }
+        activeSubscriptions: { type: integer }
+        pendingRequests: { type: integer }
+        lessons: { type: integer }
+    CatalogItemInput:
+      type: object
+      required: [type, name]
+      properties:
+        type:
+          type: string
+          enum: [stage, grade, subject, lesson]
+        name: { type: string }
+        parentId: { type: ["string", "null"] }
+    CatalogItem:
+      allOf:
+        - $ref: "#/components/schemas/CatalogItemInput"
+        - type: object
+          required: [id]
+          properties:
+            id: { type: string }
+    Settings:
+      type: object
+      required: [monthlyPrice, yearlyPrice, bankName, accountName, iban]
+      properties:
+        monthlyPrice: { type: number }
+        yearlyPrice: { type: number }
+        bankName: { type: string }
+        accountName: { type: string }
+        iban: { type: string }
+    SettingsInput:
+      $ref: "#/components/schemas/Settings"
+    AiGenerationInput:
+      type: object
+      required: [type, subject, grade]
+      properties:
+        type:
+          type: string
+          enum: [lesson, homework, exam, qiyas]
+        subject: { type: string }
+        grade: { type: string }
+        topic: { type: string }
+        imageData:
+          type: string
+          description: Optional transient image data URL for solving a photographed homework question
+          maxLength: 7000000
+        fallbackTestNumber:
+          type: integer
+          minimum: 1
+          maximum: 20
+          description: Selects one of the 20 local fallback tests when the AI provider is unavailable
+    AiGenerationResult:
+      type: object
+      required: [title, body, items]
+      properties:
+        title: { type: string }
+        body: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            required: [question, answer, explanation]
+            properties:
+              question: { type: string }
+              answer: { type: string }
+              explanation: { type: string }
+              options:
+                type: array
+                description: Multiple-choice options for a generated practice question
+                items: { type: string }
+              skill: { type: string }
+              difficulty:
+                type: string
+                enum: [سهل, متوسط, صعب]
+        source:
+          type: string
+          enum: [ai, fallback]
+        testNumber: { type: integer }
+        testsAvailable: { type: integer }
+        questionsPerTest: { type: integer }
+
